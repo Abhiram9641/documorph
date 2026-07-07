@@ -1,46 +1,71 @@
-# DocuMorph - AI Document Automation Platform
+# DocuMorph 🚀
 
-Transform your documents in seconds. AI-powered conversion, extraction, and generation.
+**AI-Powered Document Automation** — Upload, Analyze, Summarize, Convert.
+
+[![Deploy to Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Abhiram9641/documorph)
+
+---
 
 ## 🌟 Features
 
-- **Document Summary** - AI generates concise summaries of PDFs, Word docs, and more
-- **Format Conversion** - Convert between PDF, DOCX, XLSX, PPTX, and TXT
-- **Data Extraction** - Extract tables and data from spreadsheets and documents
-- **Template Filling** - Generate documents from templates with AI-powered data insertion
-- **Batch Processing** - Process multiple documents at once
+| Feature | Description |
+|---------|-------------|
+| 📝 **AI Summarization** | Extract the most important content from any document |
+| 📊 **Deep Analysis** | Readability scores, word counts, document statistics |
+| 🔍 **Data Extraction** | Automatically find emails, URLs, phone numbers |
+| 🔄 **Format Conversion** | Convert between PDF, DOCX, XLSX, TXT |
 
 ## 💰 Pricing
 
-| Tier | Price | Documents | Features |
-|------|-------|-----------|----------|
-| Free | $0 | 3/month | Basic conversion, summaries |
-| Pro | $9/month | 100/month | All features, priority processing |
-| Enterprise | $29/month | Unlimited | API access, dedicated support |
+| Tier | Price | Documents |
+|------|-------|-----------|
+| Free | $0/mo | 3/month |
+| Pro | $9/mo | 100/month |
+| Enterprise | $29/mo | Unlimited |
 
-## 🚀 Quick Start
+## 🔗 Live Demo
 
+**Try it now:** [https://8acaf3961018a1.lhr.life](https://8acaf3961018a1.lhr.life)
+
+## 🚀 Quick Deploy
+
+### One-click Vercel Deploy
+[![Deploy to Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Abhiram9641/documorph)
+
+### Manual
 ```bash
+git clone https://github.com/Abhiram9641/documorph.git
+cd documorph
 npm install
 npm start
 ```
 
-## 🌐 Deployment
+## 📦 Tech Stack
+- **Backend:** Node.js + Express
+- **Frontend:** Vanilla JS + CSS
+- **Payments:** Stripe
+- **Auth:** JWT
 
-### Vercel
+## 📄 API
+
 ```bash
-npm run deploy:vercel
+# Summarize a document
+curl -X POST https://your-domain.com/api/process \
+  -F "document=@report.pdf" \
+  -F "action=summarize"
+
+# Extract data
+curl -X POST https://your-domain.com/api/process \
+  -F "document=@contacts.xlsx" \
+  -F "action=extract"
+
+# Analyze
+curl -X POST https://your-domain.com/api/process \
+  -F "document=@essay.docx" \
+  -F "action=analyze"
 ```
 
-### Railway
-```bash
-npm run deploy:railway
-```
+---
 
-## 🔧 Tech Stack
+**Made with ❤️ by AI** — Fully autonomous build
 
-- **Backend**: Node.js + Express
-- **Frontend**: HTML, CSS (Tailwind), Vanilla JS
-- **Document Processing**: pdf-parse, mammoth, xlsx
-- **Payments**: Stripe
-- **Auth**: JWT
