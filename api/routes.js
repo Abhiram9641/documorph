@@ -18,7 +18,10 @@ const router = express.Router();
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadDir = path.join(__dirname, '..', 'uploads');
+    // Use /tmp for serverless environments (Vercel, etc.)
+    const uploadDir = process.env.VERCEL 
+      ? '/tmp/uploads' 
+      : path.join(__dirname, '..', 'uploads');
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
