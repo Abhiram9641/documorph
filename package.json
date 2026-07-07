@@ -1,0 +1,28 @@
+{
+  "name": "documorph",
+  "version": "1.0.0",
+  "description": "AI-Powered Document Automation Platform - Upload, Transform, Download",
+  "main": "api/index.js",
+  "scripts": {
+    "start": "node api/index.js",
+    "dev": "node --watch api/index.js",
+    "deploy:vercel": "vercel --prod",
+    "deploy:railway": "railway up"
+  },
+  "keywords": ["document", "ai", "automation", "pdf", "converter"],
+  "author": "DocuMorph AI",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "express": "^4.21.0",
+    "multer": "^1.4.5-lts.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.0",
+    "xlsx": "^0.18.5",
+    "pdf-parse": "^1.1.1",
+    "mammoth": "^1.8.0",
+    "stripe": "^17.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "uuid": "^10.0.0"
+  }
+}

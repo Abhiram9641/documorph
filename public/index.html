@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocuMorph - AI Document Automation</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1a1a2e; line-height: 1.6; }
+        .nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 5%; background: #fff; border-bottom: 1px solid #e8e8e8; position: sticky; top: 0; z-index: 100; }
+        .nav-logo { font-size: 1.5rem; font-weight: 800; color: #6c63ff; }
+        .nav-logo span { color: #1a1a2e; }
+        .nav-links { display: flex; gap: 2rem; align-items: center; }
+        .nav-links a { text-decoration: none; color: #555; font-weight: 500; }
+        .nav-links a:hover { color: #6c63ff; }
+        .btn-primary { background: #6c63ff; color: #fff; padding: 0.6rem 1.5rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; text-decoration: none; display: inline-block; }
+        .btn-primary:hover { background: #5a52e0; }
+        .btn-secondary { background: #fff; color: #6c63ff; padding: 0.6rem 1.5rem; border-radius: 8px; border: 2px solid #6c63ff; cursor: pointer; font-weight: 600; text-decoration: none; display: inline-block; }
+        .btn-secondary:hover { background: #f5f3ff; }
+        .btn-large { padding: 1rem 2.5rem; font-size: 1.1rem; }
+        .hero { padding: 5rem 5%; text-align: center; background: linear-gradient(135deg, #f5f3ff 0%, #e8e5ff 100%); }
+        .hero h1 { font-size: 3.2rem; font-weight: 800; margin-bottom: 1rem; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .hero h1 span { color: #6c63ff; }
+        .hero p { font-size: 1.2rem; color: #666; max-width: 650px; margin: 0 auto 2rem; }
+        .hero-cta { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .demo-section { padding: 4rem 5%; max-width: 900px; margin: 0 auto; }
+        .demo-section h2 { text-align: center; font-size: 2rem; margin-bottom: 2rem; }
+        .demo-container { background: #f8f9ff; border-radius: 16px; padding: 2rem; border: 1px solid #e8e8ff; }
+        .upload-zone { border: 2px dashed #c4bfff; border-radius: 12px; padding: 3rem 2rem; text-align: center; cursor: pointer; transition: all 0.3s; background: #fff; }
+        .upload-zone:hover, .upload-zone.dragover { border-color: #6c63ff; background: #f5f3ff; }
+        .upload-zone-icon { font-size: 3rem; margin-bottom: 1rem; }
+        .upload-zone p { color: #888; }
+        .upload-zone .supported { font-size: 0.85rem; color: #aaa; margin-top: 0.5rem; }
+        .file-info { display: none; margin-top: 1rem; padding: 1rem; background: #e8ffed; border-radius: 8px; }
+        .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1.5rem; justify-content: center; }
+        .action-btn { padding: 0.6rem 1.2rem; border: 1px solid #ddd; border-radius: 8px; background: #fff; cursor: pointer; transition: all 0.2s; }
+        .action-btn:hover { border-color: #6c63ff; color: #6c63ff; }
+        .action-btn.active { background: #6c63ff; color: #fff; border-color: #6c63ff; }
+        .process-btn { margin-top: 1.5rem; width: 100%; padding: 1rem; font-size: 1.1rem; }
+        .result { display: none; margin-top: 2rem; background: #fff; border-radius: 12px; padding: 1.5rem; border: 1px solid #e8e8ff; }
+        .result h3 { margin-bottom: 1rem; color: #6c63ff; }
+        .result-content { white-space: pre-wrap; max-height: 400px; overflow-y: auto; padding: 1rem; background: #f8f9ff; border-radius: 8px; font-size: 0.95rem; line-height: 1.7; }
+        .loading { display: none; text-align: center; padding: 2rem; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #e8e8ff; border-top-color: #6c63ff; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .features { padding: 4rem 5%; background: #fff; }
+        .features h2 { text-align: center; font-size: 2rem; margin-bottom: 3rem; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; max-width: 1100px; margin: 0 auto; }
+        .feature-card { padding: 2rem; border-radius: 12px; border: 1px solid #eee; text-align: center; transition: transform 0.2s; }
+        .feature-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(108,99,255,0.1); }
+        .feature-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+        .feature-card h3 { margin-bottom: 0.5rem; }
+        .feature-card p { color: #666; font-size: 0.95rem; }
+        .pricing { padding: 4rem 5%; background: #f5f3ff; }
+        .pricing h2 { text-align: center; font-size: 2rem; margin-bottom: 0.5rem; }
+        .pricing-subtitle { text-align: center; color: #888; margin-bottom: 3rem; }
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; max-width: 950px; margin: 0 auto; }
+        .pricing-card { background: #fff; border-radius: 16px; padding: 2.5rem 2rem; text-align: center; border: 1px solid #eee; position: relative; }
+        .pricing-card.featured { border: 2px solid #6c63ff; transform: scale(1.03); }
+        .pricing-card.featured .badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #6c63ff; color: #fff; padding: 0.3rem 1.5rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+        .pricing-card h3 { font-size: 1.3rem; margin-bottom: 1rem; }
+        .price { font-size: 2.5rem; font-weight: 800; color: #1a1a2e; }
+        .price span { font-size: 1rem; font-weight: 400; color: #888; }
+        .pricing-card ul { list-style: none; margin: 1.5rem 0; text-align: left; }
+        .pricing-card ul li { padding: 0.5rem 0; color: #555; }
+        .pricing-card ul li::before { content: '\2713 '; color: #6c63ff; font-weight: bold; }
+        .cta-section { padding: 4rem 5%; text-align: center; background: #fff; }
+        .cta-section h2 { font-size: 2rem; margin-bottom: 1rem; }
+        .cta-section p { color: #888; max-width: 600px; margin: 0 auto 2rem; }
+        .footer { padding: 2rem 5%; text-align: center; border-top: 1px solid #eee; color: #888; font-size: 0.9rem; }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.2rem; }
+            .nav-links a:not(.btn-primary) { display: none; }
+            .pricing-card.featured { transform: none; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-logo">Docu<span>Morph</span></div>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#demo">Demo</a>
+            <a href="#" class="btn-primary" id="getStartedBtn">Get Started Free</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>Transform Any Document with <span>AI Power</span></h1>
+        <p>Upload, analyze, summarize, and convert your documents in seconds. No sign-up needed for the demo.</p>
+        <div class="hero-cta">
+            <a href="#demo" class="btn-primary btn-large">Try It Free</a>
+            <a href="#pricing" class="btn-secondary btn-large">See Pricing</a>
+        </div>
+    </section>
+
+    <section class="demo-section" id="demo">
+        <h2>Try DocuMorph Now</h2>
+        <div class="demo-container">
+            <div class="upload-zone" id="uploadZone">
+                <div class="upload-zone-icon">📄</div>
+                <p><strong>Drop your document here</strong> or click to browse</p>
+                <p class="supported">Supports: PDF, DOCX, XLSX, PPTX, TXT, CSV, MD (up to 50MB)</p>
+            </div>
+            <input type="file" id="fileInput" accept=".pdf,.docx,.doc,.xlsx,.xls,.pptx,.ppt,.txt,.csv,.md" style="display:none">
+            <div class="file-info" id="fileInfo">
+                <strong>📎 <span id="fileName">file</span></strong>
+                <span style="color:#888;font-size:0.9rem" id="fileSize">(0 KB)</span>
+            </div>
+            <div class="actions" id="actionSelector">
+                <button class="action-btn active" data-action="summarize">📝 Summarize</button>
+                <button class="action-btn" data-action="analyze">📊 Analyze</button>
+                <button class="action-btn" data-action="extract">🔍 Extract Data</button>
+                <button class="action-btn" data-action="convert">🔄 Convert</button>
+            </div>
+            <button class="btn-primary process-btn" id="processBtn">✨ Process Document</button>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Processing your document...</p>
+            </div>
+            <div class="result" id="result">
+                <h3 id="resultTitle">✅ Result</h3>
+                <div class="result-content" id="resultContent"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <h2>Powerful Features</h2>
+        <div class="features-grid">
+            <div class="feature-card"><div class="feature-icon">📝</div><h3>AI Summarization</h3><p>Get concise summaries of any document in seconds. Extractive AI finds the most important content.</p></div>
+            <div class="feature-card"><div class="feature-icon">📊</div><h3>Deep Analysis</h3><p>Readability scores, word counts, and detailed document statistics in real-time.</p></div>
+            <div class="feature-card"><div class="feature-icon">🔍</div><h3>Data Extraction</h3><p>Automatically extract emails, URLs, phone numbers, and structured data from any document.</p></div>
+            <div class="feature-card"><div class="feature-icon">🔄</div><h3>Format Conversion</h3><p>Convert between PDF, DOCX, XLSX, TXT and more while preserving structure.</p></div>
+            <div class="feature-card"><div class="feature-icon">📦</div><h3>Batch Processing</h3><p>Process multiple documents at once (Pro plan). Save hours of manual work.</p></div>
+            <div class="feature-card"><div class="feature-icon">🔗</div><h3>API Access</h3><p>Integrate DocuMorph into your own tools and workflows with our REST API (Enterprise).</p></div>
+        </div>
+    </section>
+
+    <section class="pricing" id="pricing">
+        <h2>Simple Pricing</h2>
+        <p class="pricing-subtitle">Start free. Upgrade when you need more.</p>
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <h3>Free</h3>
+                <div class="price">$0<span>/month</span></div>
+                <ul><li>3 documents per month</li><li>Basic summarization</li><li>Text extraction</li><li>Up to 10MB per file</li><li>Standard processing</li></ul>
+                <a href="#demo" class="btn-secondary" style="display:block;text-align:center">Get Started</a>
+            </div>
+            <div class="pricing-card featured">
+                <div class="badge">Most Popular</div>
+                <h3>Pro</h3>
+                <div class="price">$9<span>/month</span></div>
+                <ul><li>100 documents per month</li><li>All AI features</li><li>Batch processing</li><li>Up to 50MB per file</li><li>Priority support</li><li>All format conversions</li></ul>
+                <a href="#" class="btn-primary" style="display:block;text-align:center" onclick="alert('Stripe checkout ready in production. Email: support@documorph.dev')">Subscribe</a>
+            </div>
+            <div class="pricing-card">
+                <h3>Enterprise</h3>
+                <div class="price">$29<span>/month</span></div>
+                <ul><li>Unlimited documents</li><li>All Pro features</li><li>REST API access</li><li>Custom integrations</li><li>Dedicated support</li><li>SLA guarantee</li></ul>
+                <a href="#" class="btn-secondary" style="display:block;text-align:center" onclick="alert('Contact: enterprise@documorph.dev')">Contact Sales</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <h2>Ready to Transform Your Documents?</h2>
+        <p>Join thousands of professionals who save hours every week with DocuMorph.</p>
+        <a href="#demo" class="btn-primary btn-large">Try It Free Now</a>
+    </section>
+
+    <footer class="footer">
+        <p>DocuMorph &mdash; AI-Powered Document Automation. Built with ❤️</p>
+        <p style="margin-top:0.5rem;font-size:0.8rem">© 2026 DocuMorph. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const actionBtns = document.querySelectorAll('.action-btn');
+        const processBtn = document.getElementById('processBtn');
+        const loading = document.getElementById('loading');
+        const result = document.getElementById('result');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultContent = document.getElementById('resultContent');
+
+        let selectedFile = null;
+        let selectedAction = 'summarize';
+
+        uploadZone.addEventListener('click', () => fileInput.click());
+        uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+        uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+        uploadZone.addEventListener('drop', (e) => { e.preventDefault(); uploadZone.classList.remove('dragover'); handleFile(e.dataTransfer.files[0]); });
+        fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+
+        function handleFile(file) {
+            if (!file) return;
+            selectedFile = file;
+            fileName.textContent = file.name;
+            fileSize.textContent = '(' + (file.size / 1024).toFixed(1) + ' KB)';
+            fileInfo.style.display = 'block';
+            uploadZone.style.display = 'none';
+            document.getElementById('result').style.display = 'none';
+        }
+
+        actionBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                actionBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedAction = btn.dataset.action;
+            });
+        });
+
+        processBtn.addEventListener('click', async () => {
+            if (!selectedFile) { alert('Please upload a document first.'); return; }
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            const formData = new FormData();
+            formData.append('document', selectedFile);
+            formData.append('action', selectedAction);
+            formData.append('options', '{}');
+            try {
+                const res = await fetch('/api/process', { method: 'POST', body: formData });
+                const data = await res.json();
+                loading.style.display = 'none';
+                result.style.display = 'block';
+                if (data.success) { displayResult(data.data); }
+                else { resultTitle.textContent = '❌ Error'; resultContent.textContent = data.error || 'Processing failed.'; }
+            } catch (err) {
+                loading.style.display = 'none';
+                result.style.display = 'block';
+                resultTitle.textContent = '❌ Error';
+                resultContent.textContent = 'Network error: ' + err.message;
+            }
+        });
+
+        function displayResult(data) {
+            const names = { summarize: '📝 Summary', analyze: '📊 Analysis', extract: '🔍 Extracted Data', convert: '🔄 Conversion' };
+            resultTitle.textContent = '✅ ' + (names[data.action] || 'Result');
+            let output = '';
+            if (data.summary) {
+                output += 'Summary:\n' + data.summary + '\n\n';
+                output += 'Stats: ' + data.totalWords + ' words, ' + data.totalChars + ' chars';
+                if (data.estimatedReadTime) output += ', ~' + data.estimatedReadTime + ' min read';
+                output += '\n\nKey Topics:\n';
+                if (data.keyTopics) { data.keyTopics.slice(0, 10).forEach(t => { output += '  \u2022 ' + t.word + ' (' + t.count + 'x)\n'; }); }
+            }
+            if (data.documentStats) {
+                output += 'Document Statistics:\n';
+                output += '  Words: ' + data.documentStats.totalWords + '\n';
+                output += '  Sentences: ' + data.documentStats.totalSentences + '\n';
+                output += '  Paragraphs: ' + data.documentStats.totalParagraphs + '\n';
+                output += '  Type: ' + data.documentStats.fileType + '\n';
+                if (data.readability) {
+                    output += '  Readability: ' + data.readability.score.toFixed(0) + '/100 (' + data.readability.level + ')\n';
+                    output += '  Est. Reading: ' + data.readability.estimatedReadingTimeMinutes + ' min\n';
+                }
+            }
+            if (data.emails) {
+                output += 'Extracted Data:\n';
+                if (data.emails.length > 0) output += '  Emails: ' + data.emails.join(', ') + '\n';
+                if (data.urls.length > 0) output += '  URLs: ' + data.urls.length + ' found\n';
+                if (data.phoneNumbers.length > 0) output += '  Phones: ' + data.phoneNumbers.join(', ') + '\n';
+                output += '  Total: ' + data.totalExtracted + ' items\n';
+            }
+            if (data.convertedContent) {
+                output += 'Conversion prepared. ' + (data.note || '') + '\n\nPreview:\n' + String(data.convertedContent).slice(0, 500);
+            }
+            if (data.fileName) {
+                output += '\n\nFile: ' + data.fileName + ' (' + data.fileType + ', ' + (data.fileSize / 1024).toFixed(1) + ' KB)';
+            }
+            resultContent.textContent = output || JSON.stringify(data, null, 2);
+        }
+
+        document.querySelector('.file-info').addEventListener('dblclick', function() {
+            selectedFile = null;
+            this.style.display = 'none';
+            uploadZone.style.display = 'block';
+            document.getElementById('result').style.display = 'none';
+            fileInput.value = '';
+        });
+
+        document.getElementById('getStartedBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('demo').scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
