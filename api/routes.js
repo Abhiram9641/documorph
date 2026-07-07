@@ -9,6 +9,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { processDocument } from '../lib/document-processor.js';
 import { createCheckoutSession, handleWebhook } from '../lib/payments.js';
 import { generateJWT, verifyJWT } from '../lib/auth.js';
+import { 
+  createNowPaymentsInvoice, 
+  verifyNowPaymentsIPN,
+  NOWPAYMENTS_PRICES 
+} from '../lib/nowpayments.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -152,6 +157,74 @@ router.post('/process-auth', upload.single('document'), verifyJWT, async (req, r
   } catch (error) {
     console.error('Process auth error:', error);
     res.status(500).json({ error: error.message || 'Processing failed' });
+  }
+});
+
+// NOWPayments crypto payment endpoints (no bank account needed!)
+// Create crypto payment invoice
+router.post('/payments/crypto/create', async (req, res) => {
+  try {
+    const { tier = 'pro', email } = req.body;
+    const price = NOWPAYMENTS_PRICES[tier];
+    if (!price) return res.status(400).json({ error: 'Invalid tier' });
+
+    const orderId = `documorph_${tier}_${Date.now()}_${uuidv4().slice(0, 8)}`;
+    const callbackUrl = `${process.env.FRONTEND_URL || 'https://documorph-xi.vercel.app'}/api/payments/crypto/ipn`;
+
+    const invoice = await createNowPaymentsInvoice(
+      price.amount,
+      price.currency,
+      callbackUrl,
+      orderId,
+      `${price.name} subscription for ${email || 'user'}`
+    );
+
+    res.json({
+      success: true,
+      paymentId: invoice.paymentId,
+      paymentUrl: invoice.paymentUrl,
+      payAddress: invoice.payAddress,
+      payAmount: invoice.payAmount,
+      payCurrency: invoice.payCurrency,
+      qrCode: invoice.qrCode,
+      expiresIn: '30 minutes'
+    });
+  } catch (error) {
+    console.error('NOWPayments create error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// NOWPayments IPN callback (webhook)
+router.post('/payments/crypto/ipn', express.raw({ type: 'application/json' }), async (req, res) => {
+  try {
+    const ipnData = verifyNowPaymentsIPN(req);
+    console.log('NOWPayments IPN:', ipnData);
+
+    // Handle successful payment
+    if (ipnData.status === 'finished' || ipnData.status === 'confirmed') {
+      // TODO: Update user tier in database
+      // const { orderId, paymentId } = ipnData;
+      // parse orderId: documorph_pro_1234567890_abc12345
+      // const tier = orderId.split('_')[1];
+      // await upgradeUserTier(orderId, tier, paymentId);
+      console.log(`✅ Payment confirmed: ${ipnData.paymentId} for order ${ipnData.orderId}`);
+    }
+
+    res.json({ received: true });
+  } catch (error) {
+    console.error('NOWPayments IPN error:', error);
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Check payment status
+router.get('/payments/crypto/status/:paymentId', async (req, res) => {
+  try {
+    const status = await getNowPaymentsStatus(req.params.paymentId);
+    res.json({ success: true, status });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
