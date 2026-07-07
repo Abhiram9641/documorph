@@ -154,13 +154,15 @@
                 <h3>Pro</h3>
                 <div class="price">$9<span>/month</span></div>
                 <ul><li>100 documents per month</li><li>All AI features</li><li>Batch processing</li><li>Up to 50MB per file</li><li>Priority support</li><li>All format conversions</li></ul>
-                <a href="#" class="btn-primary" style="display:block;text-align:center" onclick="alert('Stripe checkout ready in production. Email: support@documorph.dev')">Subscribe</a>
+                <a href="#" class="btn-primary" style="display:block;text-align:center" onclick="startCryptoPayment('pro')">💎 Pay with Crypto (USDT/USDC/BTC)</a>
+                <a href="#" class="btn-secondary" style="display:block;text-align:center;margin-top:0.5rem" onclick="alert('Stripe checkout ready in production. Email: support@documorph.dev')">Or Pay with Card (Stripe)</a>
             </div>
             <div class="pricing-card">
                 <h3>Enterprise</h3>
                 <div class="price">$29<span>/month</span></div>
                 <ul><li>Unlimited documents</li><li>All Pro features</li><li>REST API access</li><li>Custom integrations</li><li>Dedicated support</li><li>SLA guarantee</li></ul>
-                <a href="#" class="btn-secondary" style="display:block;text-align:center" onclick="alert('Contact: enterprise@documorph.dev')">Contact Sales</a>
+                <a href="#" class="btn-primary" style="display:block;text-align:center" onclick="startCryptoPayment('enterprise')">💎 Pay with Crypto (USDT/USDC/BTC)</a>
+                <a href="#" class="btn-secondary" style="display:block;text-align:center;margin-top:0.5rem" onclick="alert('Contact: enterprise@documorph.dev')">Contact Sales</a>
             </div>
         </div>
     </section>
@@ -289,6 +291,30 @@
             e.preventDefault();
             document.getElementById('demo').scrollIntoView({ behavior: 'smooth' });
         });
+
+        // Crypto Payment Function (NOWPayments - no bank account needed!)
+        async function startCryptoPayment(tier) {
+            const email = prompt('Enter your email for the subscription:');
+            if (!email) return;
+
+            try {
+                const res = await fetch('/api/payments/crypto/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tier, email })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    alert(`🎉 Crypto Payment Ready!\n\nTier: ${tier}\nAmount: ${tier === 'pro' ? '9' : '29'}\nPay with: ${data.payCurrency.toUpperCase()}\n\nOpening payment page...`);
+                    window.open(data.paymentUrl, '_blank');
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (err) {
+                alert('Network error: ' + err.message);
+            }
+        }
     </script>
 </body>
 </html>
